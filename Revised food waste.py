@@ -774,7 +774,7 @@ with tab3:
         # Only add trendline if statsmodels is available
         if HAS_STATSMODELS:
             fig = px.scatter(df_filtered, x='AvgInventory', y='waste', color='product',
-                             trend
+                             trend)
 
 # Analysis parameters in sidebar
 with st.sidebar:
