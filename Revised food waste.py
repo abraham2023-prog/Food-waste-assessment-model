@@ -676,7 +676,7 @@ with tab1:
 
     # Calculate overall metrics
     total_waste = df_filtered['waste'].sum()
-    total_production = df_filtered['production'].sum()
+    total_production = df_filtered['Production'].sum()
     overall_waste_rate = total_waste / total_production if total_production > 0 else 0
     total_waste_value = df_filtered['waste_value'].sum()
     avg_turnover = df_filtered['InventoryTurnover'].mean() if 'InventoryTurnover' in df_filtered.columns else 0
