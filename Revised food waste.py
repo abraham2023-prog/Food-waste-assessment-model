@@ -769,12 +769,12 @@ with tab3:
                      title="Average Months of Inventory Supply")
         st.plotly_chart(fig, use_container_width=True)
 
-    with col2:
-        st.markdown("##### Inventory vs Waste Relationship")
-        # Only add trendline if statsmodels is available
-        if HAS_STATSMODELS:
-            fig = px.scatter(df_filtered, x='AvgInventory', y='waste', color='product',
-                             trend)
+    # with col2:
+    #     st.markdown("##### Inventory vs Waste Relationship")
+    #     # Only add trendline if statsmodels is available
+    #     if HAS_STATSMODELS:
+    #         fig = px.scatter(df_filtered, x='AvgInventory', y='waste', color='product',
+    #                          trend)
 
 # Analysis parameters in sidebar
 with st.sidebar:
