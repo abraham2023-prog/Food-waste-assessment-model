@@ -61,22 +61,22 @@ product_categories = {
 }
 
 # Categorize products
-    df['Category'] = 'other'
+    # df['Category'] = 'other'
     
-    for category, keywords in product_categories.items():
-        for keyword in keywords:
-            # Use exact matching or contains based on the keyword type
-            if '*' in keyword or 'etc' in keyword:
-                # Use contains for partial matches
-                mask = df['Product'].str.contains(keyword.replace('*', '').split('(')[0].strip(), case=False, na=False)
-            else:
-                # Use exact match or contains for specific products
-                if keyword in ['Cake', 'Cookie', 'cake', 'cookie']:
-                    # For these, we need to be careful about case sensitivity
-                    mask = df['Product'].str.lower() == keyword.lower()
-                else:
-                    mask = df['Product'].str.contains(keyword, case=False, na=False)
-            df.loc[mask, 'Category'] = category
+    # for category, keywords in product_categories.items():
+    #     for keyword in keywords:
+    #         # Use exact matching or contains based on the keyword type
+    #         if '*' in keyword or 'etc' in keyword:
+    #             # Use contains for partial matches
+    #             mask = df['Product'].str.contains(keyword.replace('*', '').split('(')[0].strip(), case=False, na=False)
+    #         else:
+    #             # Use exact match or contains for specific products
+    #             if keyword in ['Cake', 'Cookie', 'cake', 'cookie']:
+    #                 # For these, we need to be careful about case sensitivity
+    #                 mask = df['Product'].str.lower() == keyword.lower()
+    #             else:
+    #                 mask = df['Product'].str.contains(keyword, case=False, na=False)
+    #         df.loc[mask, 'Category'] = category
 
 # Manual categorization for specific products that need exact matching
 manual_categories = {
