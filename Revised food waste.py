@@ -492,6 +492,12 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
+
+        # With tabs
+        tab1, tab2, tab3 = st.tabs(["Waste Analysis", "Inventory Analysis", "Trend Analysis"])
+
+        with tab1:
+            
         # 1. Waste by Category (Pie chart) - NEW
         st.subheader("Potential Waste Distribution by Category")
         waste_by_category = category_analysis['PotentialWaste']
@@ -516,7 +522,8 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
-        
+
+        with tab2:
         # 3. Inventory Months by Category - SIMILAR TO EXISTING BUT DIFFERENT FORMAT
         st.subheader("Average Months of Inventory by Category")
         inventory_months = category_analysis.sort_values('MonthsOfInventory', ascending=True)
@@ -544,9 +551,8 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
-        
-        # 5. Time series analysis of waste trends - ALREADY EXISTS IN YOUR CODE
-        # This one is already in your dashboard, so I'll skip it
+
+        with tab3:
         
         # 6. Only plot categories with significant waste - NEW
         st.subheader("Food Waste Trends for High-Waste Categories")
