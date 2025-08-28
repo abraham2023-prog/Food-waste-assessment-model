@@ -543,7 +543,7 @@ if uploaded_file is not None:
         st.download_button(
             label="Download Chart",
             data=buf1,
-            file_name="waste_distribution_pie_chart.png",
+            file_name="waste_Percentage_chart.png",
             mime="image/png",
             key="chart_download"
         )
@@ -564,6 +564,19 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
+
+        # Create download button right after displaying the plot
+        buf1 = fig_to_bytes(fig)
+        st.download_button(
+            label="Download Chart",
+            data=buf1,
+            file_name="Average_Months_of_Inventory_chart.png",
+            mime="image/png",
+            key="chart_download"
+        )
+        
+        # Close the figure to free memory
+        plt.close(fig)
         
         # 4. Top 10 Waste Products - NEW
         st.subheader("Top 10 Products by Potential Waste")
@@ -579,6 +592,19 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
+
+        # Create download button right after displaying the plot
+        buf1 = fig_to_bytes(fig)
+        st.download_button(
+            label="Download Chart",
+            data=buf1,
+            file_name="Top_10_Products_by_waste_chart.png",
+            mime="image/png",
+            key="chart_download"
+        )
+        
+        # Close the figure to free memory
+        plt.close(fig)
         
         # 6. Only plot categories with significant waste - NEW
         st.subheader("Food Waste Trends for High-Waste Categories")
@@ -594,6 +620,19 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
+
+        # Create download button right after displaying the plot
+        buf1 = fig_to_bytes(fig)
+        st.download_button(
+            label="Download Chart",
+            data=buf1,
+            file_name="Food_waste_trends_for_high waste.png",
+            mime="image/png",
+            key="chart_download"
+        )
+        
+        # Close the figure to free memory
+        plt.close(fig)
         
         # 7. Annual waste summary - NEW
         st.subheader("Total Annual Potential Food Waste")
@@ -609,6 +648,19 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
+
+        # Create download button right after displaying the plot
+        buf1 = fig_to_bytes(fig)
+        st.download_button(
+            label="Download Chart",
+            data=buf1,
+            file_name="Total_potential_food waste.png",
+            mime="image/png",
+            key="chart_download"
+        )
+        
+        # Close the figure to free memory
+        plt.close(fig)
 
         
         # # Inventory analysis section
