@@ -619,28 +619,16 @@ if uploaded_file is not None:
         st.subheader("Food Waste Trends for High-Waste Categories")
         significant_categories = yearly_waste.columns[yearly_waste.sum() > 10000]
         
-        fig5, ax5 = plt.subplots(figsize=(14, 8))
-        yearly_waste[significant_categories].plot(kind='line', marker='o', linewidth=2, ax5=ax5)
-        ax5.set_title('Food Waste Trends for High-Waste Categories (2000-2025)')
-        ax5.set_ylabel('Tons of Potential Waste')
-        ax5.set_xlabel('Year')
-        ax5.grid(True, alpha=0.3)
-        ax5.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        fig, ax = plt.subplots(figsize=(14, 8))
+        yearly_waste[significant_categories].plot(kind='line', marker='o', linewidth=2, ax=ax)
+        ax.set_title('Food Waste Trends for High-Waste Categories (2000-2025)')
+        ax.set_ylabel('Tons of Potential Waste')
+        ax.set_xlabel('Year')
+        ax.grid(True, alpha=0.3)
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
         
-        st.pyplot(fig5)
-
-        # Generate unique key for this button
-        key5 = generate_key("significant_categories", significant_categories['yearly_waste'].sum())
-        buf5 = fig_to_bytes(fig5)
-        st.download_button(
-            label="Download yearly waste chart",
-            data=buf5,
-            file_name="yearly_waste_chart.png",
-            mime="image/png",
-            key=key5  
-        )
-        plt.close(fig5)
+        st.pyplot(fig)
         
         # 7. Annual waste summary - NEW
         st.subheader("Total Annual Potential Food Waste")
