@@ -13,6 +13,8 @@ def load_data():
     df = pd.read_csv("Only food.csv")
     category_analysis = pd.read_csv("Only food.csv", index_col=0)
     return df, category_analysis
+# Clean column names
+df.columns = df.columns.str.strip().str.replace("\n", " ", regex=True)
 
 df, category_analysis = load_data()
 
