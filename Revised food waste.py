@@ -8,6 +8,14 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 import io
+import zipfile
+from PIL import Image
+
+def fig_to_bytes(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=300, bbox_inches='tight', transparent=True)
+    buf.seek(0)
+    return buf
 
 
 # Set page configuration
@@ -504,6 +512,16 @@ if uploaded_file is not None:
         ax.grid(False)
         
         st.pyplot(fig)
+
+        # Download
+        buf1 = fig_to_bytes(fig1)
+        st.download_button(
+            label="Download Pie Chart",
+            data=buf1,
+            file_name="waste_distribution_pie_chart.png",
+            mime="image/png",
+            key="pie_chart_download"
+        )
         
         # 2. Waste Percentage by Category (Bar chart) - NEW
         st.subheader("Waste as Percentage of Production")
