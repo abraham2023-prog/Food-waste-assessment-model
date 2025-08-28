@@ -7,6 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+import io
 
 # Set page configuration
 st.set_page_config(
@@ -16,15 +17,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load and process data (your existing code)
-@st.cache_data
-def load_and_process_data():
-    # Your existing data loading and processing code here
-    # (Copy all the code from your provided script, starting from loading the CSV)
+# File upload function
+def load_and_process_data(uploaded_file):
+    # Read the uploaded file
+    if uploaded_file.name.endswith('.csv'):
+        df = pd.read_csv(uploaded_file, encoding='utf-8')
+    else:
+        # Handle other file types if needed
+        st.error("Please upload a CSV file")
+        return None
     
-    # Load and clean data
-    df = pd.read_csv('Only food.csv', encoding='utf-8')
-
+    # Your existing data processing code here
     # Clean numeric columns
     numeric_columns = ['Begin month\ninventory', 'Production', 'Domestic', 'Export', 'Total',
                        'Shipment value\n(thousand baht)', 'Month-end \ninventory', 'Capacity']
@@ -70,7 +73,7 @@ def load_and_process_data():
         'Ready made pig feed': 'ton',
         'Ready made shrimp feed': 'ton',
         'Ready to cook meals (others)': 'ton',
-        # 'Ready-made pig feed': 'ton',
+        'Ready-made pig feed': 'ton',
         'Toasted bread/Cracker/Biscuit': 'ton',
         'Wafer biscuit': 'ton',
         'Yogurt': 'ton',
@@ -158,7 +161,7 @@ def load_and_process_data():
         'animal_feed': ['Ready made pig feed', 'Ready made chicken feed',
                        'Ready made fish feed', 'Ready made shrimp feed',
                        'Ready made duck feed', 'Ready made pet feed', 'Pet feed',
-                       'ready made feed for other livestock'],
+                       'ready made feed for other livestock', 'Ready-made pig feed'],
         'dairy': ['Yogurt', 'ice cream'],
         'staples': ['Tapioca flour', 'Instant noodles', 'instant noodles',
                    'Premix', 'Soy milk', 'Dried fruits and vegetables',
@@ -191,7 +194,7 @@ def load_and_process_data():
         'Other baked goods (pizza, donuts, sandwich bread)': 'bakery',
         'Other crispy snacks (Corn chips, prawn crackers, etc)': 'snacks',
         'Ready to cook meals (others)': 'frozen_foods',
-        # 'Ready-made pig feed': 'animal_feed',
+        'Ready-made pig feed': 'animal_feed',
         'Soy sauce, fermented soybean paste, dark soy sauce': 'condiments',
         'Soy sauce, fermented soybean paste, light soy sauce ': 'condiments',
         'dried fruits & vegetables': 'staples',
@@ -350,182 +353,211 @@ def load_and_process_data():
     
     return df
 
-# Load the data
-df = load_and_process_data()
-
-# Create summary data
-category_analysis = df.groupby('Category').agg({
-    'PotentialWaste': 'sum',
-    'InventoryShrinkage': 'sum',
-    'Production': 'sum',
-    'Total': 'sum',
-    'MonthsOfInventory': 'mean'
-}).round(2)
-
-category_analysis['WastePercentage'] = (category_analysis['PotentialWaste'] /
-                                       category_analysis['Production'] * 100).round(2)
-
-# Top waste products
-high_waste_products = df.groupby(['Product', 'Unit']).agg({
-    'PotentialWaste': 'sum',
-    'Production': 'sum',
-    'MonthsOfInventory': 'mean'
-}).nlargest(10, 'PotentialWaste')
-
-high_waste_products['WastePercentage'] = (high_waste_products['PotentialWaste'] /
-                                         high_waste_products['Production'] * 100).round(2)
-
-# Dashboard layout
+# Main dashboard
 st.title("📊 Food Waste Analysis Dashboard")
 st.markdown("Analyzing food waste patterns across different product categories")
 
-# Sidebar filters
-st.sidebar.header("Filters")
-selected_categories = st.sidebar.multiselect(
-    "Select Categories",
-    options=df['Category'].unique(),
-    default=df['Category'].unique()
-)
+# File upload section
+st.sidebar.header("Data Upload")
+uploaded_file = st.sidebar.file_uploader("Upload your food data CSV file", type=["csv"])
 
-year_range = st.sidebar.slider(
-    "Select Year Range",
-    min_value=int(df['Year'].min()),
-    max_value=int(df['Year'].max()),
-    value=(int(df['Year'].min()), int(df['Year'].max()))
-)
+if uploaded_file is not None:
+    # Process the uploaded file
+    df = load_and_process_data(uploaded_file)
+    
+    if df is not None:
+        # Create summary data
+        category_analysis = df.groupby('Category').agg({
+            'PotentialWaste': 'sum',
+            'InventoryShrinkage': 'sum',
+            'Production': 'sum',
+            'Total': 'sum',
+            'MonthsOfInventory': 'mean'
+        }).round(2)
 
-# Filter data based on selections
-filtered_df = df[(df['Category'].isin(selected_categories)) & 
-                 (df['Year'] >= year_range[0]) & 
-                 (df['Year'] <= year_range[1])]
+        category_analysis['WastePercentage'] = (category_analysis['PotentialWaste'] /
+                                               category_analysis['Production'] * 100).round(2)
 
-# Key metrics
-st.subheader("Key Metrics")
-col1, col2, col3, col4 = st.columns(4)
+        # Top waste products
+        high_waste_products = df.groupby(['Product', 'Unit']).agg({
+            'PotentialWaste': 'sum',
+            'Production': 'sum',
+            'MonthsOfInventory': 'mean'
+        }).nlargest(10, 'PotentialWaste')
 
-with col1:
-    total_waste = filtered_df['PotentialWaste'].sum()
-    st.metric("Total Potential Waste", f"{total_waste:,.0f} tons")
+        high_waste_products['WastePercentage'] = (high_waste_products['PotentialWaste'] /
+                                                 high_waste_products['Production'] * 100).round(2)
 
-with col2:
-    total_production = filtered_df['Production'].sum()
-    waste_percentage = (total_waste / total_production * 100) if total_production > 0 else 0
-    st.metric("Waste Percentage", f"{waste_percentage:.2f}%")
+        # Sidebar filters
+        st.sidebar.header("Filters")
+        selected_categories = st.sidebar.multiselect(
+            "Select Categories",
+            options=df['Category'].unique(),
+            default=df['Category'].unique()
+        )
 
-with col3:
-    avg_inventory_months = filtered_df['MonthsOfInventory'].mean()
-    st.metric("Avg Inventory Months", f"{avg_inventory_months:.1f}")
+        year_range = st.sidebar.slider(
+            "Select Year Range",
+            min_value=int(df['Year'].min()),
+            max_value=int(df['Year'].max()),
+            value=(int(df['Year'].min()), int(df['Year'].max()))
+        )
 
-with col4:
-    total_shrinkage = filtered_df['InventoryShrinkage'].sum()
-    st.metric("Inventory Shrinkage", f"{total_shrinkage:,.0f} tons")
+        # Filter data based on selections
+        filtered_df = df[(df['Category'].isin(selected_categories)) & 
+                         (df['Year'] >= year_range[0]) & 
+                         (df['Year'] <= year_range[1])]
 
-# Charts
-st.subheader("Waste Analysis by Category")
+        # Key metrics
+        st.subheader("Key Metrics")
+        col1, col2, col3, col4 = st.columns(4)
 
-col1, col2 = st.columns(2)
+        with col1:
+            total_waste = filtered_df['PotentialWaste'].sum()
+            st.metric("Total Potential Waste", f"{total_waste:,.0f} tons")
 
-with col1:
-    # Waste by category (bar chart)
-    fig = px.bar(
-        category_analysis.reset_index(), 
-        x='Category', 
-        y='PotentialWaste',
-        title="Total Waste by Category",
-        labels={'PotentialWaste': 'Waste (tons)', 'Category': 'Product Category'}
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        with col2:
+            total_production = filtered_df['Production'].sum()
+            waste_percentage = (total_waste / total_production * 100) if total_production > 0 else 0
+            st.metric("Waste Percentage", f"{waste_percentage:.2f}%")
 
-with col2:
-    # Waste percentage by category
-    fig = px.bar(
-        category_analysis.reset_index(), 
-        x='Category', 
-        y='WastePercentage',
-        title="Waste Percentage by Category",
-        labels={'WastePercentage': 'Waste (%)', 'Category': 'Product Category'}
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        with col3:
+            avg_inventory_months = filtered_df['MonthsOfInventory'].mean()
+            st.metric("Avg Inventory Months", f"{avg_inventory_months:.1f}")
 
-# Time series analysis
-st.subheader("Trend Analysis Over Time")
+        with col4:
+            total_shrinkage = filtered_df['InventoryShrinkage'].sum()
+            st.metric("Inventory Shrinkage", f"{total_shrinkage:,.0f} tons")
 
-# Aggregate data by date and category
-time_series_data = filtered_df.groupby(['Date', 'Category']).agg({
-    'PotentialWaste': 'sum',
-    'Production': 'sum',
-    'Month-end \ninventory': 'mean'
-}).reset_index()
+        # Charts
+        st.subheader("Waste Analysis by Category")
 
-fig = px.line(
-    time_series_data, 
-    x='Date', 
-    y='PotentialWaste', 
-    color='Category',
-    title="Waste Trends Over Time",
-    labels={'PotentialWaste': 'Waste (tons)', 'Date': 'Time'}
-)
-st.plotly_chart(fig, use_container_width=True)
+        col1, col2 = st.columns(2)
 
-# Top products with highest waste
-st.subheader("Top 10 Products with Highest Waste")
+        with col1:
+            # Waste by category (bar chart)
+            fig = px.bar(
+                category_analysis.reset_index(), 
+                x='Category', 
+                y='PotentialWaste',
+                title="Total Waste by Category",
+                labels={'PotentialWaste': 'Waste (tons)', 'Category': 'Product Category'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
-fig = px.bar(
-    high_waste_products.reset_index(), 
-    x='Product', 
-    y='PotentialWaste',
-    title="Top 10 High Waste Products",
-    labels={'PotentialWaste': 'Waste (tons)', 'Product': 'Product Name'}
-)
-st.plotly_chart(fig, use_container_width=True)
+        with col2:
+            # Waste percentage by category
+            fig = px.bar(
+                category_analysis.reset_index(), 
+                x='Category', 
+                y='WastePercentage',
+                title="Waste Percentage by Category",
+                labels={'WastePercentage': 'Waste (%)', 'Category': 'Product Category'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
-# Inventory analysis
-st.subheader("Inventory Analysis")
+        # Time series analysis - Matplotlib version
+        st.subheader("Food Waste Trends by Category (2000-2025)")
+        
+        # Create the matplotlib plot
+        yearly_waste = df.groupby(['Year', 'Category'])['PotentialWaste'].sum().unstack().fillna(0)
 
-col1, col2 = st.columns(2)
+        fig, ax = plt.subplots(figsize=(14, 8))
+        yearly_waste.plot(kind='line', marker='o', ax=ax)
+        ax.set_title('Food Waste Trends by Category (2000-2025)')
+        ax.set_ylabel('Tons of Potential Waste')
+        ax.set_xlabel('Year')
+        ax.grid(True, alpha=0.3)
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.tight_layout()
+        
+        # Display the plot in Streamlit
+        st.pyplot(fig)
 
-with col1:
-    # Inventory turnover by category
-    turnover_data = filtered_df.groupby('Category')['InventoryTurnover'].mean().reset_index()
-    fig = px.bar(
-        turnover_data, 
-        x='Category', 
-        y='InventoryTurnover',
-        title="Average Inventory Turnover by Category",
-        labels={'InventoryTurnover': 'Turnover Ratio', 'Category': 'Product Category'}
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        # Time series analysis - Plotly version
+        st.subheader("Trend Analysis Over Time")
 
-with col2:
-    # Months of inventory by category
-    months_data = filtered_df.groupby('Category')['MonthsOfInventory'].mean().reset_index()
-    fig = px.bar(
-        months_data, 
-        x='Category', 
-        y='MonthsOfInventory',
-        title="Average Months of Inventory by Category",
-        labels={'MonthsOfInventory': 'Months', 'Category': 'Product Category'}
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        # Aggregate data by date and category
+        time_series_data = filtered_df.groupby(['Date', 'Category']).agg({
+            'PotentialWaste': 'sum',
+            'Production': 'sum',
+            'Month-end \ninventory': 'mean'
+        }).reset_index()
 
-# Detailed data view
-st.subheader("Detailed Data")
-if st.checkbox("Show raw data"):
-    st.dataframe(filtered_df)
+        fig = px.line(
+            time_series_data, 
+            x='Date', 
+            y='PotentialWaste', 
+            color='Category',
+            title="Waste Trends Over Time",
+            labels={'PotentialWaste': 'Waste (tons)', 'Date': 'Time'}
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
-# Download button
-@st.cache_data
-def convert_df_to_csv(df):
-    return df.to_csv(index=False).encode('utf-8')
+        # Top products with highest waste
+        st.subheader("Top 10 Products with Highest Waste")
 
-csv = convert_df_to_csv(filtered_df)
+        fig = px.bar(
+            high_waste_products.reset_index(), 
+            x='Product', 
+            y='PotentialWaste',
+            title="Top 10 High Waste Products",
+            labels={'PotentialWaste': 'Waste (tons)', 'Product': 'Product Name'}
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
-st.download_button(
-    label="Download filtered data as CSV",
-    data=csv,
-    file_name="filtered_food_waste_data.csv",
-    mime="text/csv",
-)
+        # Inventory analysis
+        st.subheader("Inventory Analysis")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Inventory turnover by category
+            turnover_data = filtered_df.groupby('Category')['InventoryTurnover'].mean().reset_index()
+            fig = px.bar(
+                turnover_data, 
+                x='Category', 
+                y='InventoryTurnover',
+                title="Average Inventory Turnover by Category",
+                labels={'InventoryTurnover': 'Turnover Ratio', 'Category': 'Product Category'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            # Months of inventory by category
+            months_data = filtered_df.groupby('Category')['MonthsOfInventory'].mean().reset_index()
+            fig = px.bar(
+                months_data, 
+                x='Category', 
+                y='MonthsOfInventory',
+                title="Average Months of Inventory by Category",
+                labels={'MonthsOfInventory': 'Months', 'Category': 'Product Category'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Detailed data view
+        st.subheader("Detailed Data")
+        if st.checkbox("Show raw data"):
+            st.dataframe(filtered_df)
+
+        # Download button
+        @st.cache_data
+        def convert_df_to_csv(df):
+            return df.to_csv(index=False).encode('utf-8')
+
+        csv = convert_df_to_csv(filtered_df)
+
+        st.download_button(
+            label="Download filtered data as CSV",
+            data=csv,
+            file_name="filtered_food_waste_data.csv",
+            mime="text/csv",
+        )
+
+    else:
+        st.error("Error processing the uploaded file. Please check the file format.")
+else:
+    st.info("Please upload a CSV file to begin analysis.")
 
 # Footer
 st.markdown("---")
