@@ -10,6 +10,7 @@ from datetime import datetime
 import io
 import zipfile
 from PIL import Image
+import hashlib
 
 
 # Function to convert matplotlib figure to bytes
