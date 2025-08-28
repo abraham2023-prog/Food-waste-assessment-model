@@ -20,6 +20,7 @@ st.title("📊 Food Waste Analysis Dashboard")
 
 # ========= SUMMARY METRICS =========
 col1, col2, col3, col4 = st.columns(4)
+st.write("Columns in dataset:", df.columns.tolist())
 col1.metric("Total Production (tons)", f"{df['Production'].sum():,.0f}")
 col2.metric("Estimated Waste (tons)", f"{df['PotentialWaste'].sum():,.0f}")
 col3.metric("Inventory Shrinkage (tons)", f"{df['InventoryShrinkage'].sum():,.0f}")
