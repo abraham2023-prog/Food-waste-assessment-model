@@ -18,8 +18,14 @@ df, category_analysis = load_data()
 
 st.title("📊 Food Waste Analysis Dashboard")
 
-# Clean column names
-df.columns = df.columns.str.strip().str.replace("\n", " ", regex=True)
+# Clean numeric columns
+numeric_cols = ["Production", "Domestic", "Export", "Total", 
+                "Shipment value (thousand baht)", "Capacity"]
+
+for col in numeric_cols:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col].astype(str).str.replace(",", "").str.strip(), errors="coerce")
+
 # ========= SUMMARY METRICS =========
 col1, col2, col3, col4 = st.columns(4)
 st.write("Columns in dataset:", df.columns.tolist())
