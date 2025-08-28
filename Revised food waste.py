@@ -512,84 +512,6 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
-        # # 1. Waste by Category (Pie chart)
-        # st.subheader("Potential Waste Distribution by Category")
-        # waste_by_category = category_analysis['PotentialWaste']
-        
-        # fig1, ax1 = plt.subplots(figsize=(8, 8))
-        # ax1.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
-        # ax1.set_title('Potential Waste Distribution by Category')
-        # ax1.axis('equal')
-        # ax1.grid(False)
-        
-        # st.pyplot(fig1)
-        
-        # # Create download button right after displaying the plot
-        # buf1 = fig_to_bytes(fig1)
-        # st.download_button(
-        #     label="Download Pie Chart",
-        #     data=buf1,
-        #     file_name="waste_distribution_pie_chart.png",
-        #     mime="image/png",
-        #     key="pie_chart_download"
-        # )
-        
-        # # Close the figure to free memory
-        # plt.close(fig1)
-        
-        # # 2. Waste Percentage by Category (Bar chart) - NEW
-        # st.subheader("Waste as Percentage of Production")
-        # sorted_categories = category_analysis.sort_values('WastePercentage', ascending=True)
-        
-        # fig, ax = plt.subplots(figsize=(10, 6))
-        # ax.barh(sorted_categories.index, sorted_categories['WastePercentage'])
-        # ax.set_title('Waste as Percentage of Production')
-        # ax.set_xlabel('Waste Percentage (%)')
-        # ax.grid(axis='x', alpha=0.3)
-        # plt.tight_layout()
-        
-        # st.pyplot(fig)
-
-        # # Create download button right after displaying the plot
-        # buf1 = fig_to_bytes(fig)
-        # st.download_button(
-        #     label="Download Chart",
-        #     data=buf1,
-        #     file_name="waste_Percentage_chart.png",
-        #     mime="image/png",
-        #     key="chart_download"
-        # )
-        
-        # # Close the figure to free memory
-        # plt.close(fig)
-
-  
-        # # 3. Inventory Months by Category - SIMILAR TO EXISTING BUT DIFFERENT FORMAT
-        # st.subheader("Average Months of Inventory by Category")
-        # inventory_months = category_analysis.sort_values('MonthsOfInventory', ascending=True)
-        
-        # fig, ax = plt.subplots(figsize=(10, 6))
-        # ax.barh(inventory_months.index, inventory_months['MonthsOfInventory'])
-        # ax.set_title('Average Months of Inventory by Category')
-        # ax.set_xlabel('Months of Inventory')
-        # ax.grid(axis='x', alpha=0.3)
-        # plt.tight_layout()
-        
-        # st.pyplot(fig)
-
-        # # Create download button right after displaying the plot
-        # buf1 = fig_to_bytes(fig)
-        # st.download_button(
-        #     label="Download Chart",
-        #     data=buf1,
-        #     file_name="Average_Months_of_Inventory_chart.png",
-        #     mime="image/png",
-        #     key="chart_download"
-        # )
-        
-        # # Close the figure to free memory
-        # plt.close(fig)
-
         # 1. Waste by Category (Pie chart)
         st.subheader("Potential Waste Distribution by Category")
         waste_by_category = category_analysis['PotentialWaste']
@@ -669,16 +591,29 @@ if uploaded_file is not None:
         st.subheader("Top 10 Products by Potential Waste")
         top_products = high_waste_products.head(10)
         
-        fig, ax = plt.subplots(figsize=(10, 8))
-        ax.barh(range(len(top_products)), top_products['PotentialWaste'])
-        ax.set_yticks(range(len(top_products)))
-        ax.set_yticklabels([p[:20] + '...' if len(p) > 20 else p for p in top_products.index])
-        ax.set_title('Top 10 Products by Potential Waste')
-        ax.set_xlabel('Tons of Potential Waste')
-        ax.grid(axis='x', alpha=0.3)
+        fig4, ax4 = plt.subplots(figsize=(10, 8))
+        ax4.barh(range(len(top_products)), top_products['PotentialWaste'])
+        ax4.set_yticks(range(len(top_products)))
+        ax4.set_yticklabels([p[:20] + '...' if len(p) > 20 else p for p in top_products.index])
+        ax4.set_title('Top 10 Products by Potential Waste')
+        ax4.set_xlabel('Tons of Potential Waste')
+        ax4.grid(axis='x', alpha=0.3)
         plt.tight_layout()
         
-        st.pyplot(fig)
+        st.pyplot(fig4)
+
+        # Generate unique key for this button
+        key4 = generate_key("top_products", inventory_months['PotentialWaste'].sum())
+        buf4 = fig_to_bytes(fig4)
+        st.download_button(
+            label="Download top products by waste",
+            data=buf4,
+            file_name="top_products_by_waste_chart.png",
+            mime="image/png",
+            key=key4  
+        )
+        plt.close(fig4)
+        
         
         # 6. Only plot categories with significant waste - NEW
         st.subheader("Food Waste Trends for High-Waste Categories")
