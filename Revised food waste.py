@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 import io
+import plotly.graph_objects as go
 
 # Set page configuration
 st.set_page_config(
@@ -474,23 +475,62 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
-        # Inventory turnover analysis
-        st.subheader("Inventory Turnover Analysis")
+        # # Inventory turnover analysis
+        # st.subheader("Inventory Turnover Analysis")
         
-        # Create the matplotlib plot
-        turnover_by_category = df.groupby('Category')['InventoryTurnover'].mean().sort_values()
+        # # Create the matplotlib plot
+        # turnover_by_category = df.groupby('Category')['InventoryTurnover'].mean().sort_values()
         
-        fig, ax = plt.subplots(figsize=(12, 6))
-        turnover_by_category.plot(kind='barh', ax=ax)
-        ax.set_title('Average Inventory Turnover by Product Category')
-        ax.set_xlabel('Inventory Turnover Ratio')
-        ax.axvline(x=1, color='red', linestyle='--', alpha=0.7, label='Ideal Minimum (1.0)')
-        ax.legend()
-        plt.tight_layout()
+        # fig, ax = plt.subplots(figsize=(12, 6))
+        # turnover_by_category.plot(kind='barh', ax=ax)
+        # ax.set_title('Average Inventory Turnover by Product Category')
+        # ax.set_xlabel('Inventory Turnover Ratio')
+        # ax.axvline(x=1, color='red', linestyle='--', alpha=0.7, label='Ideal Minimum (1.0)')
+        # ax.legend()
+        # plt.tight_layout()
         
-        # Display the plot in Streamlit
-        st.pyplot(fig)
+        # # Display the plot in Streamlit
+        # st.pyplot(fig)
 
+        # Inventory analysis section
+        st.subheader("Inventory Analysis")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Inventory turnover by category (using Plotly)
+            turnover_by_category = filtered_df.groupby('Category')['InventoryTurnover'].mean().sort_values()
+            
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                y=turnover_by_category.index,
+                x=turnover_by_category.values,
+                orientation='h',
+                marker_color='lightblue'
+            ))
+            fig.add_vline(x=1, line_dash="dash", line_color="red", 
+                          annotation_text="Ideal Minimum (1.0)", 
+                          annotation_position="top right")
+            fig.update_layout(
+                title='Average Inventory Turnover by Category',
+                xaxis_title='Turnover Ratio',
+                yaxis_title='Category',
+                height=400
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            # Months of inventory by category (existing code)
+            months_data = filtered_df.groupby('Category')['MonthsOfInventory'].mean().reset_index()
+            fig = px.bar(
+                months_data, 
+                x='Category', 
+                y='MonthsOfInventory',
+                title="Average Months of Inventory by Category",
+                labels={'MonthsOfInventory': 'Months', 'Category': 'Product Category'}
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        
         # Time series analysis - Plotly version
         st.subheader("Trend Analysis Over Time")
 
