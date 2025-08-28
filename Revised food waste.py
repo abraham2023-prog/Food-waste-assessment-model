@@ -613,22 +613,6 @@ if uploaded_file is not None:
             key=key4  
         )
         plt.close(fig4)
-        
-        
-        # # 5. Only plot categories with significant waste - NEW
-        # st.subheader("Food Waste Trends for High-Waste Categories")
-        # significant_categories = yearly_waste.columns[yearly_waste.sum() > 10000]
-        
-        # fig, ax = plt.subplots(figsize=(14, 8))
-        # yearly_waste[significant_categories].plot(kind='line', marker='o', linewidth=2, ax=ax)
-        # ax.set_title('Food Waste Trends for High-Waste Categories (2000-2025)')
-        # ax.set_ylabel('Tons of Potential Waste')
-        # ax.set_xlabel('Year')
-        # ax.grid(True, alpha=0.3)
-        # ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        # plt.tight_layout()
-        
-        # st.pyplot(fig)
 
         # 5. Only plot categories with significant waste - NEW
         st.subheader("Food Waste Trends for High-Waste Categories")
@@ -656,20 +640,69 @@ if uploaded_file is not None:
         )
         plt.close(fig5)
         
-        # 7. Annual waste summary - NEW
+        # # 7. Annual waste summary - NEW
+        # st.subheader("Total Annual Potential Food Waste")
+        # annual_waste = df.groupby('Year')['PotentialWaste'].sum()
+        
+        # fig, ax = plt.subplots(figsize=(12, 6))
+        # ax.plot(annual_waste.index, annual_waste.values, marker='o', linewidth=2)
+        # ax.set_title('Total Annual Potential Food Waste')
+        # ax.set_ylabel('Tons of Waste')
+        # ax.set_xlabel('Year')
+        # ax.grid(True, alpha=0.3)
+        # plt.xticks(rotation=45)
+        # plt.tight_layout()
+        
+        # st.pyplot(fig)
+
+        
+        # 6. Annual waste summary
         st.subheader("Total Annual Potential Food Waste")
         annual_waste = df.groupby('Year')['PotentialWaste'].sum()
         
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.plot(annual_waste.index, annual_waste.values, marker='o', linewidth=2)
-        ax.set_title('Total Annual Potential Food Waste')
-        ax.set_ylabel('Tons of Waste')
-        ax.set_xlabel('Year')
-        ax.grid(True, alpha=0.3)
+        fig6, ax6 = plt.subplots(figsize=(12, 6))
+        ax6.plot(annual_waste.index, annual_waste.values, marker='o', linewidth=2)
+        ax6.set_title('Total Annual Potential Food Waste')
+        ax6.set_ylabel('Tons of Waste')
+        ax6.set_xlabel('Year')
+        ax6.grid(True, alpha=0.3)
         plt.xticks(rotation=45)
         plt.tight_layout()
         
-        st.pyplot(fig)
+        st.pyplot(fig6)
+        buf6 = fig_to_bytes(fig6)
+        st.download_button(
+            label="Download Annual Waste Chart",
+            data=buf6,
+            file_name="annual_waste_chart.png",
+            mime="image/png",
+            key="annual_waste_download_006"
+        )
+        plt.close(fig6)
+        
+        # 7. Time series analysis (if not already included)
+        st.subheader("Food Waste Trends by Category")
+        yearly_waste = df.groupby(['Year', 'Category'])['PotentialWaste'].sum().unstack().fillna(0)
+        
+        fig7, ax7 = plt.subplots(figsize=(14, 8))
+        yearly_waste.plot(kind='line', marker='o', ax=ax7)
+        ax7.set_title('Food Waste Trends by Category (2000-2025)')
+        ax7.set_ylabel('Tons of Potential Waste')
+        ax7.set_xlabel('Year')
+        ax7.grid(True, alpha=0.3)
+        ax7.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.tight_layout()
+        
+        st.pyplot(fig7)
+        buf7 = fig_to_bytes(fig7)
+        st.download_button(
+            label="Download All Categories Trends Chart",
+            data=buf7,
+            file_name="all_categories_trends_chart.png",
+            mime="image/png",
+            key="all_categories_trends_download_007"
+        )
+        plt.close(fig7
 
         
         # # Inventory analysis section
