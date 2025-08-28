@@ -501,19 +501,31 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
             
-        # 1. Waste by Category (Pie chart) - NEW
+        # # 1. Waste by Category (Pie chart) - NEW
+        # st.subheader("Potential Waste Distribution by Category")
+        # waste_by_category = category_analysis['PotentialWaste']
+        
+        # fig, ax = plt.subplots(figsize=(8, 8))
+        # ax.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
+        # ax.set_title('Potential Waste Distribution by Category')
+        # ax.axis('equal')
+        # ax.grid(False)
+        
+        # st.pyplot(fig)
+
+        # 1. Waste by Category (Pie chart)
         st.subheader("Potential Waste Distribution by Category")
         waste_by_category = category_analysis['PotentialWaste']
         
-        fig, ax = plt.subplots(figsize=(8, 8))
-        ax.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
-        ax.set_title('Potential Waste Distribution by Category')
-        ax.axis('equal')
-        ax.grid(False)
+        fig1, ax1 = plt.subplots(figsize=(8, 8))
+        ax1.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
+        ax1.set_title('Potential Waste Distribution by Category')
+        ax1.axis('equal')
+        ax1.grid(False)
         
-        st.pyplot(fig)
-
-        # Download
+        st.pyplot(fig1)
+        
+        # Create download button right after displaying the plot
         buf1 = fig_to_bytes(fig1)
         st.download_button(
             label="Download Pie Chart",
@@ -522,6 +534,9 @@ if uploaded_file is not None:
             mime="image/png",
             key="pie_chart_download"
         )
+        
+        # Close the figure to free memory
+        plt.close(fig1)
         
         # 2. Waste Percentage by Category (Bar chart) - NEW
         st.subheader("Waste as Percentage of Production")
