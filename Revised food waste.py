@@ -702,7 +702,7 @@ if uploaded_file is not None:
             mime="image/png",
             key="all_categories_trends_download_007"
         )
-        plt.close(fig7
+        plt.close(fig7)
 
         
         # # Inventory analysis section
