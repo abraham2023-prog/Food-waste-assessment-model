@@ -492,6 +492,93 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
+        # 1. Waste by Category (Pie chart) - NEW
+        st.subheader("Potential Waste Distribution by Category")
+        waste_by_category = category_analysis['PotentialWaste']
+        
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
+        ax.set_title('Potential Waste Distribution by Category')
+        ax.axis('equal')
+        ax.grid(False)
+        
+        st.pyplot(fig)
+        
+        # 2. Waste Percentage by Category (Bar chart) - NEW
+        st.subheader("Waste as Percentage of Production")
+        sorted_categories = category_analysis.sort_values('WastePercentage', ascending=True)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(sorted_categories.index, sorted_categories['WastePercentage'])
+        ax.set_title('Waste as Percentage of Production')
+        ax.set_xlabel('Waste Percentage (%)')
+        ax.grid(axis='x', alpha=0.3)
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+        
+        # 3. Inventory Months by Category - SIMILAR TO EXISTING BUT DIFFERENT FORMAT
+        st.subheader("Average Months of Inventory by Category")
+        inventory_months = category_analysis.sort_values('MonthsOfInventory', ascending=True)
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(inventory_months.index, inventory_months['MonthsOfInventory'])
+        ax.set_title('Average Months of Inventory by Category')
+        ax.set_xlabel('Months of Inventory')
+        ax.grid(axis='x', alpha=0.3)
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+        
+        # 4. Top 10 Waste Products - NEW
+        st.subheader("Top 10 Products by Potential Waste")
+        top_products = high_waste_products.head(10)
+        
+        fig, ax = plt.subplots(figsize=(10, 8))
+        ax.barh(range(len(top_products)), top_products['PotentialWaste'])
+        ax.set_yticks(range(len(top_products)))
+        ax.set_yticklabels([p[:20] + '...' if len(p) > 20 else p for p in top_products.index])
+        ax.set_title('Top 10 Products by Potential Waste')
+        ax.set_xlabel('Tons of Potential Waste')
+        ax.grid(axis='x', alpha=0.3)
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+        
+        # 5. Time series analysis of waste trends - ALREADY EXISTS IN YOUR CODE
+        # This one is already in your dashboard, so I'll skip it
+        
+        # 6. Only plot categories with significant waste - NEW
+        st.subheader("Food Waste Trends for High-Waste Categories")
+        significant_categories = yearly_waste.columns[yearly_waste.sum() > 10000]
+        
+        fig, ax = plt.subplots(figsize=(14, 8))
+        yearly_waste[significant_categories].plot(kind='line', marker='o', linewidth=2, ax=ax)
+        ax.set_title('Food Waste Trends for High-Waste Categories (2000-2025)')
+        ax.set_ylabel('Tons of Potential Waste')
+        ax.set_xlabel('Year')
+        ax.grid(True, alpha=0.3)
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+        
+        # 7. Annual waste summary - NEW
+        st.subheader("Total Annual Potential Food Waste")
+        annual_waste = df.groupby('Year')['PotentialWaste'].sum()
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(annual_waste.index, annual_waste.values, marker='o', linewidth=2)
+        ax.set_title('Total Annual Potential Food Waste')
+        ax.set_ylabel('Tons of Waste')
+        ax.set_xlabel('Year')
+        ax.grid(True, alpha=0.3)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+
+        
         # # Inventory analysis section
         # st.subheader("Inventory Analysis")
         
