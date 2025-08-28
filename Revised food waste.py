@@ -130,5 +130,28 @@ if not df_filtered.empty:
     ax3.set_ylabel("Waste (tons)")
     st.pyplot(fig3)
 
+# Clean column names first (remove spaces, make consistent)
+df.columns = df.columns.str.strip().str.replace(" ", "").str.replace("-", "").str.lower()
+
+# Dictionary of expected columns (normalized)
+expected_columns = {
+    "production": "Production",
+    "potentialwaste": "PotentialWaste"
+}
+
+# Metrics section
+col1, col2 = st.columns(2)
+
+# Total Production
+if "production" in df.columns:
+    col1.metric("Total Production (tons)", f"{df['production'].sum():,.0f}")
+else:
+    col1.metric("Total Production (tons)", "N/A")
+
+# Estimated Waste
+if "potentialwaste" in df.columns:
+    col2.metric("Estimated Waste (tons)", f"{df['potentialwaste'].sum():,.0f}")
+else:
+    col2.metric("Estimated Waste (tons)", "N/A")
 
 
