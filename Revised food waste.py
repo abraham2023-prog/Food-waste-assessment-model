@@ -704,10 +704,10 @@ if uploaded_file is not None:
             mime="text/csv",
         )
 
-    else:
-        st.error("Error processing the uploaded file. Please check the file format.")
-else:
-    st.info("Please upload a CSV file to begin analysis.")
+        else:
+            st.error("Error processing the uploaded file. Please check the file format.")
+        else:
+            st.info("Please upload a CSV file to begin analysis.")
 
 # Footer
 st.markdown("---")
