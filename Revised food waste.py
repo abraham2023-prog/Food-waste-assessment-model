@@ -10,8 +10,8 @@ st.set_page_config(page_title="Food Waste Dashboard", layout="wide")
 # ========= LOAD DATA =========
 @st.cache_data
 def load_data():
-    df = pd.read_csv("final_waste_analysis_with_units.csv")
-    category_analysis = pd.read_csv("final_category_analysis.csv", index_col=0)
+    df = pd.read_csv("Only food.csv")
+    category_analysis = pd.read_csv("Only food.csv", index_col=0)
     return df, category_analysis
 
 df, category_analysis = load_data()
