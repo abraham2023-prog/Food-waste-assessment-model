@@ -474,6 +474,23 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
+        # Inventory turnover analysis
+        st.subheader("Inventory Turnover Analysis")
+        
+        # Create the matplotlib plot
+        turnover_by_category = df.groupby('Category')['InventoryTurnover'].mean().sort_values()
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        turnover_by_category.plot(kind='barh', ax=ax)
+        ax.set_title('Average Inventory Turnover by Product Category')
+        ax.set_xlabel('Inventory Turnover Ratio')
+        ax.axvline(x=1, color='red', linestyle='--', alpha=0.7, label='Ideal Minimum (1.0)')
+        ax.legend()
+        plt.tight_layout()
+        
+        # Display the plot in Streamlit
+        st.pyplot(fig)
+
         # Time series analysis - Plotly version
         st.subheader("Trend Analysis Over Time")
 
