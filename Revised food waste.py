@@ -640,22 +640,6 @@ if uploaded_file is not None:
         )
         plt.close(fig5)
         
-        # # 7. Annual waste summary - NEW
-        # st.subheader("Total Annual Potential Food Waste")
-        # annual_waste = df.groupby('Year')['PotentialWaste'].sum()
-        
-        # fig, ax = plt.subplots(figsize=(12, 6))
-        # ax.plot(annual_waste.index, annual_waste.values, marker='o', linewidth=2)
-        # ax.set_title('Total Annual Potential Food Waste')
-        # ax.set_ylabel('Tons of Waste')
-        # ax.set_xlabel('Year')
-        # ax.grid(True, alpha=0.3)
-        # plt.xticks(rotation=45)
-        # plt.tight_layout()
-        
-        # st.pyplot(fig)
-
-        
         # 6. Annual waste summary
         st.subheader("Total Annual Potential Food Waste")
         annual_waste = df.groupby('Year')['PotentialWaste'].sum()
@@ -704,45 +688,6 @@ if uploaded_file is not None:
         )
         plt.close(fig7)
 
-        
-        # # Inventory analysis section
-        # st.subheader("Inventory Analysis")
-        
-        # col1, col2 = st.columns(2)
-        
-        # with col1:
-        #     # Inventory turnover by category (using Plotly)
-        #     turnover_by_category = filtered_df.groupby('Category')['InventoryTurnover'].mean().sort_values()
-            
-        #     fig = go.Figure()
-        #     fig.add_trace(go.Bar(
-        #         y=turnover_by_category.index,
-        #         x=turnover_by_category.values,
-        #         orientation='h',
-        #         marker_color='lightblue'
-        #     ))
-        #     fig.add_vline(x=1, line_dash="dash", line_color="red", 
-        #                   annotation_text="Ideal Minimum (1.0)", 
-        #                   annotation_position="top right")
-        #     fig.update_layout(
-        #         title='Average Inventory Turnover by Category',
-        #         xaxis_title='Turnover Ratio',
-        #         yaxis_title='Category',
-        #         height=400
-        #     )
-        #     st.plotly_chart(fig, use_container_width=True)
-        
-        # with col2:
-        #     # Months of inventory by category (existing code)
-        #     months_data = filtered_df.groupby('Category')['MonthsOfInventory'].mean().reset_index()
-        #     fig = px.bar(
-        #         months_data, 
-        #         x='Category', 
-        #         y='MonthsOfInventory',
-        #         title="Average Months of Inventory by Category",
-        #         labels={'MonthsOfInventory': 'Months', 'Category': 'Product Category'}
-        #     )
-        #     st.plotly_chart(fig, use_container_width=True)
         
         # Time series analysis - Plotly version
         st.subheader("Trend Analysis Over Time")
