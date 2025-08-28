@@ -33,7 +33,7 @@ def generate_key(prefix, data=None):
 # Set page configuration
 st.set_page_config(
     page_title="Food Waste Analysis Dashboard",
-    page_icon="🍎🍽️🥦>🗑️",
+    page_icon="🍽️🥦🗑️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
