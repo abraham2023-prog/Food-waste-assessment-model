@@ -11,12 +11,23 @@ import io
 import zipfile
 from PIL import Image
 
+
+# Function to convert matplotlib figure to bytes
 def fig_to_bytes(fig):
     buf = io.BytesIO()
     fig.savefig(buf, format='png', dpi=300, bbox_inches='tight', transparent=True)
     buf.seek(0)
     return buf
 
+# Function to generate unique keys based on content
+def generate_key(prefix, data=None):
+    if data is not None:
+        # Create a hash based on the data to ensure uniqueness
+        data_str = str(data).encode()
+        hash_str = hashlib.md5(data_str).hexdigest()[:8]
+        return f"{prefix}_{hash_str}"
+    return f"{prefix}_{hashlib.md5(str(np.random.rand()).encode()).hexdigest()[:8]}"
+    
 
 # Set page configuration
 st.set_page_config(
@@ -500,6 +511,84 @@ if uploaded_file is not None:
         # Display the plot in Streamlit
         st.pyplot(fig)
 
+        # # 1. Waste by Category (Pie chart)
+        # st.subheader("Potential Waste Distribution by Category")
+        # waste_by_category = category_analysis['PotentialWaste']
+        
+        # fig1, ax1 = plt.subplots(figsize=(8, 8))
+        # ax1.pie(waste_by_category, labels=waste_by_category.index, autopct='%1.1f%%')
+        # ax1.set_title('Potential Waste Distribution by Category')
+        # ax1.axis('equal')
+        # ax1.grid(False)
+        
+        # st.pyplot(fig1)
+        
+        # # Create download button right after displaying the plot
+        # buf1 = fig_to_bytes(fig1)
+        # st.download_button(
+        #     label="Download Pie Chart",
+        #     data=buf1,
+        #     file_name="waste_distribution_pie_chart.png",
+        #     mime="image/png",
+        #     key="pie_chart_download"
+        # )
+        
+        # # Close the figure to free memory
+        # plt.close(fig1)
+        
+        # # 2. Waste Percentage by Category (Bar chart) - NEW
+        # st.subheader("Waste as Percentage of Production")
+        # sorted_categories = category_analysis.sort_values('WastePercentage', ascending=True)
+        
+        # fig, ax = plt.subplots(figsize=(10, 6))
+        # ax.barh(sorted_categories.index, sorted_categories['WastePercentage'])
+        # ax.set_title('Waste as Percentage of Production')
+        # ax.set_xlabel('Waste Percentage (%)')
+        # ax.grid(axis='x', alpha=0.3)
+        # plt.tight_layout()
+        
+        # st.pyplot(fig)
+
+        # # Create download button right after displaying the plot
+        # buf1 = fig_to_bytes(fig)
+        # st.download_button(
+        #     label="Download Chart",
+        #     data=buf1,
+        #     file_name="waste_Percentage_chart.png",
+        #     mime="image/png",
+        #     key="chart_download"
+        # )
+        
+        # # Close the figure to free memory
+        # plt.close(fig)
+
+  
+        # # 3. Inventory Months by Category - SIMILAR TO EXISTING BUT DIFFERENT FORMAT
+        # st.subheader("Average Months of Inventory by Category")
+        # inventory_months = category_analysis.sort_values('MonthsOfInventory', ascending=True)
+        
+        # fig, ax = plt.subplots(figsize=(10, 6))
+        # ax.barh(inventory_months.index, inventory_months['MonthsOfInventory'])
+        # ax.set_title('Average Months of Inventory by Category')
+        # ax.set_xlabel('Months of Inventory')
+        # ax.grid(axis='x', alpha=0.3)
+        # plt.tight_layout()
+        
+        # st.pyplot(fig)
+
+        # # Create download button right after displaying the plot
+        # buf1 = fig_to_bytes(fig)
+        # st.download_button(
+        #     label="Download Chart",
+        #     data=buf1,
+        #     file_name="Average_Months_of_Inventory_chart.png",
+        #     mime="image/png",
+        #     key="chart_download"
+        # )
+        
+        # # Close the figure to free memory
+        # plt.close(fig)
+
         # 1. Waste by Category (Pie chart)
         st.subheader("Potential Waste Distribution by Category")
         waste_by_category = category_analysis['PotentialWaste']
@@ -512,71 +601,68 @@ if uploaded_file is not None:
         
         st.pyplot(fig1)
         
-        # Create download button right after displaying the plot
+        # Generate unique key for this button
+        key1 = generate_key("pie_chart", waste_by_category.sum())
         buf1 = fig_to_bytes(fig1)
         st.download_button(
             label="Download Pie Chart",
             data=buf1,
             file_name="waste_distribution_pie_chart.png",
             mime="image/png",
-            key="pie_chart_download"
+            key=key1  # Unique key
         )
-        
-        # Close the figure to free memory
         plt.close(fig1)
         
-        # 2. Waste Percentage by Category (Bar chart) - NEW
+        # 2. Waste Percentage by Category (Bar chart)
         st.subheader("Waste as Percentage of Production")
         sorted_categories = category_analysis.sort_values('WastePercentage', ascending=True)
         
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.barh(sorted_categories.index, sorted_categories['WastePercentage'])
-        ax.set_title('Waste as Percentage of Production')
-        ax.set_xlabel('Waste Percentage (%)')
-        ax.grid(axis='x', alpha=0.3)
+        fig2, ax2 = plt.subplots(figsize=(10, 6))
+        ax2.barh(sorted_categories.index, sorted_categories['WastePercentage'])
+        ax2.set_title('Waste as Percentage of Production')
+        ax2.set_xlabel('Waste Percentage (%)')
+        ax2.grid(axis='x', alpha=0.3)
         plt.tight_layout()
         
-        st.pyplot(fig)
-
-        # Create download button right after displaying the plot
-        buf1 = fig_to_bytes(fig)
-        st.download_button(
-            label="Download Chart",
-            data=buf1,
-            file_name="waste_Percentage_chart.png",
-            mime="image/png",
-            key="chart_download"
-        )
+        st.pyplot(fig2)
         
-        # Close the figure to free memory
-        plt.close(fig)
-
-  
-        # 3. Inventory Months by Category - SIMILAR TO EXISTING BUT DIFFERENT FORMAT
+        # Generate unique key for this button
+        key2 = generate_key("waste_pct", sorted_categories['WastePercentage'].sum())
+        buf2 = fig_to_bytes(fig2)
+        st.download_button(
+            label="Download Waste Percentage Chart",
+            data=buf2,
+            file_name="waste_percentage_chart.png",
+            mime="image/png",
+            key=key2  # Unique key
+        )
+        plt.close(fig2)
+        
+        # 3. Inventory Months by Category
         st.subheader("Average Months of Inventory by Category")
         inventory_months = category_analysis.sort_values('MonthsOfInventory', ascending=True)
         
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.barh(inventory_months.index, inventory_months['MonthsOfInventory'])
-        ax.set_title('Average Months of Inventory by Category')
-        ax.set_xlabel('Months of Inventory')
-        ax.grid(axis='x', alpha=0.3)
+        fig3, ax3 = plt.subplots(figsize=(10, 6))
+        ax3.barh(inventory_months.index, inventory_months['MonthsOfInventory'])
+        ax3.set_title('Average Months of Inventory by Category')
+        ax3.set_xlabel('Months of Inventory')
+        ax3.grid(axis='x', alpha=0.3)
         plt.tight_layout()
         
-        st.pyplot(fig)
-
-        # Create download button right after displaying the plot
-        buf1 = fig_to_bytes(fig)
-        st.download_button(
-            label="Download Chart",
-            data=buf1,
-            file_name="Average_Months_of_Inventory_chart.png",
-            mime="image/png",
-            key="chart_download"
-        )
+        st.pyplot(fig3)
         
-        # Close the figure to free memory
-        plt.close(fig)
+        # Generate unique key for this button
+        key3 = generate_key("inventory_months", inventory_months['MonthsOfInventory'].sum())
+        buf3 = fig_to_bytes(fig3)
+        st.download_button(
+            label="Download Inventory Months Chart",
+            data=buf3,
+            file_name="inventory_months_chart.png",
+            mime="image/png",
+            key=key3  # Unique key
+        )
+        plt.close(fig3)
+
         
         # 4. Top 10 Waste Products - NEW
         st.subheader("Top 10 Products by Potential Waste")
@@ -592,19 +678,6 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
-
-        # Create download button right after displaying the plot
-        buf1 = fig_to_bytes(fig)
-        st.download_button(
-            label="Download Chart",
-            data=buf1,
-            file_name="Top_10_Products_by_waste_chart.png",
-            mime="image/png",
-            key="chart_download"
-        )
-        
-        # Close the figure to free memory
-        plt.close(fig)
         
         # 6. Only plot categories with significant waste - NEW
         st.subheader("Food Waste Trends for High-Waste Categories")
@@ -620,19 +693,6 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
-
-        # Create download button right after displaying the plot
-        buf1 = fig_to_bytes(fig)
-        st.download_button(
-            label="Download Chart",
-            data=buf1,
-            file_name="Food_waste_trends_for_high waste.png",
-            mime="image/png",
-            key="chart_download"
-        )
-        
-        # Close the figure to free memory
-        plt.close(fig)
         
         # 7. Annual waste summary - NEW
         st.subheader("Total Annual Potential Food Waste")
@@ -648,19 +708,6 @@ if uploaded_file is not None:
         plt.tight_layout()
         
         st.pyplot(fig)
-
-        # Create download button right after displaying the plot
-        buf1 = fig_to_bytes(fig)
-        st.download_button(
-            label="Download Chart",
-            data=buf1,
-            file_name="Total_potential_food waste.png",
-            mime="image/png",
-            key="chart_download"
-        )
-        
-        # Close the figure to free memory
-        plt.close(fig)
 
         
         # # Inventory analysis section
